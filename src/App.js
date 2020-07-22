@@ -90,7 +90,6 @@ class App extends React.Component {
     if (route === "signout") {
       this.setState(initialState);
     } else if (route === "home") {
-      const id = this.state.user.id;
       this.setState({ isSignedIn: true });
     }
     this.setState({ route: route });
