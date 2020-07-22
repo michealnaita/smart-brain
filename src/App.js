@@ -8,11 +8,7 @@ import Register from "./components/Register/Register.js";
 import Signin from "./components/Signin/Signin.js";
 import Rank from "./components/Rank/Rank.js";
 import Particles from "react-particles-js";
-import Clarifai from "clarifai";
 
-const app = new Clarifai.App({
-  apiKey: "7c9e62e8f935466bae4bc095365edf10",
-});
 const particalsOptions = {
   particles: {
     number: {
@@ -24,30 +20,26 @@ const particalsOptions = {
     },
   },
 };
+
+const initialState = {
+  input: "",
+  imageUrl: "",
+  box: {},
+  route: "signin",
+  isSignedIn: false,
+  user: {
+    id: "",
+    name: "",
+    email: "",
+    entries: 0,
+    joined: "",
+  },
+};
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {
-      input: "",
-      imageUrl: "",
-      box: {},
-      route: "signin",
-      isSignedIn: false,
-      user: {
-        id: "",
-        name: "",
-        email: "",
-        entries: 0,
-        joined: "",
-      },
-    };
+    this.state = initialState;
   }
-
-  // updateUsername=(data)=>{
-  //   this.setState({
-  //     username:data.name
-  //   });
-  // }
 
   loadUser = (data) => {
     this.setState({
@@ -68,12 +60,15 @@ class App extends React.Component {
 
   handleSubmit = () => {
     this.setState({ imageUrl: this.state.input });
-
-    app.models
-      .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
+    fetch("https://safe-spire-64190.herokuapp.com/imageurl", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: this.state.input }),
+    })
+      .then((res) => res.json())
       .then((response) => {
         if (response) {
-          fetch("http://localhost:3001/image", {
+          fetch("https://safe-spire-64190.herokuapp.com/image", {
             method: "put",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: this.state.user.id }),
@@ -81,7 +76,8 @@ class App extends React.Component {
             .then((res) => res.json())
             .then((count) => {
               this.setState(Object.assign(this.state.user, { entries: count }));
-            });
+            })
+            .catch(console.log);
         }
         this.displayFaceBox(this.calculateFaceLocation(response));
       })
@@ -92,7 +88,7 @@ class App extends React.Component {
 
   handleRouteChange = (route) => {
     if (route === "signout") {
-      this.setState({ isSignedIn: false });
+      this.setState(initialState);
     } else if (route === "home") {
       const id = this.state.user.id;
       this.setState({ isSignedIn: true });

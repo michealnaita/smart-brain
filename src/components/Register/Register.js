@@ -24,7 +24,7 @@ class Register extends React.Component {
 	//SUBMITING
 
 	onSubmitRegister = () => {
-		fetch("http://localhost:3001/register", {
+		fetch("https://safe-spire-64190.herokuapp.com/register", {
 			method: "post",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -35,7 +35,7 @@ class Register extends React.Component {
 		})
 			.then((res) => res.json())
 			.then((user) => {
-				if (user) {
+				if (user.id) {
 					this.props.loadUser(user);
 					this.props.onRouteChange("home");
 				}
@@ -64,6 +64,7 @@ class Register extends React.Component {
 									type="text"
 									name="name"
 									id="name"
+									required
 								/>
 							</div>
 							<div className="mt3">
@@ -79,6 +80,7 @@ class Register extends React.Component {
 									type="email"
 									name="email-address"
 									id="email-address"
+									required
 								/>
 							</div>
 							<div className="mv3">
@@ -94,6 +96,7 @@ class Register extends React.Component {
 									type="password"
 									name="password"
 									id="password"
+									required
 								/>
 							</div>
 						</fieldset>
